@@ -28,6 +28,13 @@ const promptMenu = [
       name: 'action'
     },
   ];
+const addDeptPrompt = [
+  {
+    message: `What is the Department name: `,
+    type: `input`,
+    name: `newDept`
+  }
+]
 
 const viewDept = () => {
     connection.query(`SELECT * FROM department`, (err, data) => {
@@ -58,8 +65,13 @@ const viewEmployees = () => {
   }
   
 const addDept = () => {
-    console.log(`you selected add department`)
-    mainMenu()
+  inquirer.prompt(addDeptPrompt)
+    .then((data) => { 
+      console.log(data.newDept)
+      connection.query(`INSERT INTO department (name) VALUES (?)`, data.newDept)
+
+    })
+    
 }
 
 const addRole = () => {
@@ -83,7 +95,7 @@ const exit = () => {
 }
 
 const mainMenu = () => {
-    inquirer.prompt(menuQuestions).then((data) => {
+    inquirer.prompt(promptMenu).then((data) => {
       const action = data.action;
       switch (action) {
         case `View All Departments`:
@@ -114,3 +126,4 @@ const mainMenu = () => {
     });
   }
 
+mainMenu()
