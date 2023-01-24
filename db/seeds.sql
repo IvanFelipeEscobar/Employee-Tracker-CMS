@@ -1,17 +1,17 @@
 INSERT INTO department (name)
 VALUES
-    ("Tech"),
-    ("Customer Service"),
-    ("Human Resources");
+    ("HR"),
+    ("Sales"),
+    ("Engineering");
 
 INSERT INTO role (title, salary, department_id)
 VALUES 
-    ("Developer", 70000, 1), 
-    ("Sales Associate", 12000, 2), 
-    ("HR Rep", 55000, 3);
+    ("Sr. Developer", 150000, 1), 
+    ("Sales Rep", 54300, 2), 
+    ("HR Rep", 73500, 3);
 
 INSERT INTO employee (first_name, last_name, role_id, manager_id)
 VALUES 
-    ("Walter", "White", 3, 3),
-    ("Jesse", "Pinkman", 2, 3),
-    ("Mike", "Ehrmantraut", 1, NULL);
+    ("Zoro", "Ronoroa", 3, 3),
+    ("Chopper", "Tony", 2, 3),
+    ("Monkey", "Luffy", 1, NULL);

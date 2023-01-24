@@ -10,7 +10,7 @@ const connection = mysql.createConnection({
   database: 'employee_db'
 },
 console.log(`Connection to employee_db was succesful`));
-
+//question array for main menu inquirer prompt
 const promptMenu = [
     {
       message: `What would you like to do?`,
@@ -28,6 +28,7 @@ const promptMenu = [
       name: 'action'
     },
   ];
+// question array for add department inquirer prompt
 const addDeptPrompt = [
   {
     message: `What is the Department name: `,
@@ -35,19 +36,31 @@ const addDeptPrompt = [
     name: `newDept`
   }
 ]
+// question array for add role inquirer prompt
+const rolePrompt = [
+]
+
+//question array for add employee inquirer prompt
+const employeePrompt = [
+
+]
 
 const viewDept = () => {
     connection.query(`SELECT * FROM department`, (err, data) => {
-      console.table(data);
+      err ? console.error(err) : console.table(data);
       mainMenu();
     });
   }
   
 const viewRoles = () => {
     connection.query(
-      `SELECT role.id, role.title, department.name AS department, role.salary FROM role JOIN department ON role.department_id = department.id ORDER BY role.id`,
+      `SELECT role.id, role.title, department.name 
+      AS department, role.salary 
+      FROM role JOIN department 
+      ON role.department_id = department.id 
+      ORDER BY role.id`,
       (err, data) => {
-        console.table(data);
+        err ? console.error(err) : console.table(data);
         mainMenu();
       }
     );
@@ -55,10 +68,15 @@ const viewRoles = () => {
   
 const viewEmployees = () => {
     connection.query(
-      `SELECT employee.id, employee.first_name, employee.last_name, role.title, department.name AS department, role.salary, IF(employee.manager_id IS NOT NULL, CONCAT(manager.first_name, ' ', manager.last_name), NULL) as manager_name FROM employee JOIN role ON employee.role_id = role.id JOIN department ON department.id = role.department_id LEFT JOIN employee manager ON employee.manager_id = manager.id ORDER BY employee.id;`,
+      `SELECT employee.id, employee.first_name, employee.last_name, role.title, department.name 
+      AS department, role.salary, 
+      IF(employee.manager_id IS NOT NULL, CONCAT(manager.first_name, ' ', manager.last_name), NULL) as manager_name 
+      FROM employee JOIN role ON employee.role_id = role.id 
+      JOIN department ON department.id = role.department_id 
+      LEFT JOIN employee manager ON employee.manager_id = manager.id 
+      ORDER BY employee.id;`,
       (err, data) => {
-        console.table(data);
-  
+        err ? console.error(err) : console.table(data);
         mainMenu();
       }
     );
@@ -67,15 +85,17 @@ const viewEmployees = () => {
 const addDept = () => {
   inquirer.prompt(addDeptPrompt)
     .then((data) => { 
-      console.log(data.newDept)
+      console.log(`New Department created by the name: ${data.newDept}`)
       connection.query(`INSERT INTO department (name) VALUES (?)`, data.newDept)
-
-    })
+    }).catch(err => console.error(err));
     
 }
 
 const addRole = () => {
     console.log(`you selected add role`)
+    let roleArray = connection.query(`SELECT id, name FROM department`, (err, data) => {
+      err ? console.error(err) : console.log(data)
+    })
     mainMenu()
 }
 
@@ -123,7 +143,7 @@ const mainMenu = () => {
           exit();
           break;
       }
-    });
+    }).catch(err => console.error(err));
   }
 
 mainMenu()
