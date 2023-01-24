@@ -36,9 +36,6 @@ const addDeptPrompt = [
     name: `newDept`
   }
 ]
-// question array for add role inquirer prompt
-const rolePrompt = [
-]
 
 //question array for add employee inquirer prompt
 const employeePrompt = [
@@ -87,16 +84,54 @@ const addDept = () => {
     .then((data) => { 
       console.log(`New Department created by the name: ${data.newDept}`)
       connection.query(`INSERT INTO department (name) VALUES (?)`, data.newDept)
-    }).catch(err => console.error(err));
+      mainMenu()
+    })
+    .catch(err => console.error(err));
     
 }
 
 const addRole = () => {
     console.log(`you selected add role`)
-    let roleArray = connection.query(`SELECT id, name FROM department`, (err, data) => {
-      err ? console.error(err) : console.log(data)
+    let deptArray = {name:[], id:[]}
+    connection.query(`SELECT id, name FROM department`, (err, data) => {
+      err ?
+       console.error(err) :
+       data.forEach( (dept) => { //iterates through ever item in array reurned from mysql query and populates name and id arrays in deptarray object
+          deptArray.name.push(dept.name)
+          deptArray.id.push(dept.id) } )
+          
     })
-    mainMenu()
+    // question array for add role inquirer prompt
+    const rolePrompt = [
+    {
+      message: "What is the name of the role you would like to add?",
+      type: "input",
+      name: "roleName",
+    },
+    {
+      message: "What is the salary of the role?",
+      type: "input",
+      name: "roleSalary",
+    },
+    {
+      message: "What is the department of the role?",
+      type: "list",
+      choices: deptArray.name,
+      name: "roleDepartment",
+    }
+  ]
+
+      inquirer.prompt(rolePrompt)
+      .then((data) => {
+        let index = deptArray.name.indexOf(data.roleDepartment) //sql query needs id,  so index of method used to match id with corresponding dept name
+        let deptName = deptArray.id[index]
+        connection.query(`INSERT INTO role (title, salary, department_id) VALUES (?, ?, ?)`,
+        [data.roleName, data.roleSalary, deptName])
+        console.log()
+        mainMenu()
+      })
+      .catch(err => console.error(err))
+    
 }
 
 const addEmployee = () => {
