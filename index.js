@@ -130,8 +130,7 @@ const addRole = () => {
 
 const addEmployee = () => {
   let empRole = []
-  let managers = [`none`
-]
+  let managers = [`none`]
   connection.query(`SELECT * FROM role`, (err, roleData) => {
     err?
     console.error(err) :
@@ -173,7 +172,16 @@ const employeePrompt = [
   }
 ]
 inquirer.prompt(employeePrompt).then((data) => {
-  console.log(data)
+  if (data.employeeManager !== `none`) {
+    connection.query(y(`INSERT INTO employee (first_name, last_name, role_id, manager_id) VALUES (?, ?, ?, ?)`,
+     [data.firstName, data.lastName, data.employeeRole, data.employeeManager]))
+  } else {
+    connection.query(y(`INSERT INTO employee (first_name, last_name, role_id, manager_id) VALUES (?, ?, ?, ?)`,
+     [data.firstName, data.lastName, data.employeeRole, null]))
+  }
+  console.log(`${data.firstName} ${data.lastName} has been added as a new emplyee`)
+  mainMenu()
+
 })
     
 }
