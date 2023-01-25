@@ -37,11 +37,6 @@ const addDeptPrompt = [
   }
 ]
 
-//question array for add employee inquirer prompt
-const employeePrompt = [
-
-]
-
 const viewDept = () => {
     connection.query(`SELECT * FROM department`, (err, data) => {
       err ? console.error(err) : console.table(data);
@@ -121,8 +116,7 @@ const addRole = () => {
     }
   ]
 
-      inquirer.prompt(rolePrompt)
-      .then((data) => {
+      inquirer.prompt(rolePrompt).then((data) => {
         let index = deptArray.name.indexOf(data.roleDepartment) //sql query needs id,  so index of method used to match id with corresponding dept name
         let deptName = deptArray.id[index]
         connection.query(`INSERT INTO role (title, salary, department_id) VALUES (?, ?, ?)`,
@@ -135,8 +129,53 @@ const addRole = () => {
 }
 
 const addEmployee = () => {
-    console.log(`you selected add employee`)
-    mainMenu()
+  let empRole = []
+  let managers = [`none`
+]
+  connection.query(`SELECT * FROM role`, (err, roleData) => {
+    err?
+    console.error(err) :
+    roleData.forEach((role) => {
+      empRole.push(role.title)
+    })
+   })
+  connection.query(`SELECT first_name FROM employee WHERE manager_id is NULL`, (err, data) => {
+    err?
+    console.error(err) :
+    data.forEach((element) => {
+      managers.push(element.first_name)
+      
+    })
+  })
+  //question array for add employee inquirer prompt
+const employeePrompt = [
+  {
+    message: "Enter first name",
+    type: "input",
+    name: "firstName",
+  },
+  {
+    message: "Enter last name",
+    type: "input",
+    name: "lastName",
+  },
+  {
+    message: "Enter role",
+    type: "list",
+    choices: empRole,
+    name: "employeeRole",
+  },
+  {
+    message: "Select employee manager",
+    type: "list",
+    choices: managers,
+    name: "employeeManager",
+  }
+]
+inquirer.prompt(employeePrompt).then((data) => {
+  console.log(data)
+})
+    
 }
 
 const updateRole = () => {
