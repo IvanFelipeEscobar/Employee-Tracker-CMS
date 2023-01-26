@@ -28,14 +28,6 @@ const promptMenu = [
       name: 'action'
     },
   ];
-// question array for add department inquirer prompt
-const addDeptPrompt = [
-  {
-    message: `What is the Department name: `,
-    type: `input`,
-    name: `newDept`
-  }
-]
 
 const viewDept = () => {
     connection.query(`SELECT * FROM department`, (err, data) => {
@@ -75,6 +67,14 @@ const viewEmployees = () => {
   }
   
 const addDept = () => {
+  // question array for add department inquirer prompt
+const addDeptPrompt = [
+  {
+    message: `What is the Department name: `,
+    type: `input`,
+    name: `newDept`
+  }
+]
   inquirer.prompt(addDeptPrompt)
     .then((data) => { 
       console.log(`New Department created by the name: ${data.newDept}`)
@@ -98,20 +98,20 @@ const addRole = () => {
     // question array for add role inquirer prompt
     const rolePrompt = [
     {
-      message: "What is the name of the role you would like to add?",
-      type: "input",
-      name: "roleName",
+      message: `What is the name of the role you would like to add?`,
+      type: `input`,
+      name: `roleName`,
     },
     {
-      message: "What is the salary of the role?",
-      type: "input",
-      name: "roleSalary",
+      message: `What is the salary of the role?`,
+      type: `input`,
+      name: `roleSalary`,
     },
     {
-      message: "What is the department of the role?",
-      type: "list",
+      message: `What is the department of the role?`,
+      type: `list`,
       choices: deptArray.name,
-      name: "roleDepartment",
+      name: `roleDepartment`,
     }
   ]
 
@@ -142,35 +142,35 @@ const addEmployee = () => {
    })
   connection.query(`SELECT first_name, id FROM employee WHERE manager_id is NULL`, (err, data) => {
     err?
-    console.error(err) :
-    data.forEach((element) => {
-      managers.push(element.first_name)   
-      manID.push(element.id)  
+      console.error(err) :
+      data.forEach((element) => {
+        managers.push(element.first_name)   
+        manID.push(element.id)  
     })
   })
   //question array for add employee inquirer prompt
 const employeePrompt = [
   {
-    message: "Enter first name",
-    type: "input",
-    name: "firstName",
+    message: `Enter first name`,
+    type: `input`,
+    name: `firstName`,
   },
   {
-    message: "Enter last name",
-    type: "input",
-    name: "lastName",
+    message: `Enter last name`,
+    type: `input`,
+    name: `lastName`,
   },
   {
-    message: "Enter role",
-    type: "list",
+    message: `Enter role`,
+    type: `list`,
     choices: empRole.title,
-    name: "employeeRole",
+    name: `employeeRole`,
   },
   {
-    message: "Select employee manager",
-    type: "list",
+    message: `Select employee manager`,
+    type: `list`,
     choices: managers,
-    name: "employeeManager",
+    name: `employeeManager`,
   }
 ]
 
@@ -193,8 +193,55 @@ inquirer.prompt(employeePrompt).then((data) => {
 }
 
 const updateRole = () => {
-    console.log(`you selected update employee role`)
+  let employeeList =  {name:[], id:[]}
+  
+
+  connection.query(`SELECT first_name, last_name, id FROM employee`, (err, nameData) => {
+    err?
+      console.error(err):
+      nameData.forEach((obj) => {
+        employeeList.name.push(`${obj.first_name} ${obj.last_name}`)
+        employeeList.id.push(obj.id)
+      })
+    })
+  let roleList = {id:[], title: []}
+  connection.query(`SELECT id, title FROM role`, (err, roleData) => {
+    err?
+      console.error(err):
+      roleData.forEach((obj)=>{
+        roleList.id.push(obj.id)
+        roleList.title.push(obj.title)
+      })
+    })
+
+
+  const updateRolePrompt = [
+    {
+      message: `Select employee you want to update`,
+      type: `list`,
+      choices: employeeList.name,
+      name: `updatedEmployee`,
+    },
+    {
+      message: `Select new role for slected employee`,
+      type: `list`,
+      choices: roleList.title,
+      name: `updatedRole`,
+    }
+  ]
+
+  inquirer.prompt(updateRolePrompt).then((data) => {
+    let empIndex = employeeList.name.indexOf(data.updatedEmployee)
+    let idIndex = roleList.title.indexOf(data.updatedRole)
+    connection.query(`UPDATE employee SET ? WHERE ?`, [
+      { role_id: roleList.id[idIndex] },
+      { id: employeeList.id[empIndex]},
+    ])
+
+    console.log(`the role of ${data.updatedEmployee} has been updated to ${data.updatedRole}`)
     mainMenu()
+  }).catch(err => console.error(err))
+    
 }
 
 const exit = () => {
