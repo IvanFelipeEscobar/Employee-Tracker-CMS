@@ -93,8 +93,7 @@ const addRole = () => {
        console.error(err) :
        data.forEach( (dept) => { //iterates through ever item in array reurned from mysql query and populates name and id arrays in deptarray object
           deptArray.name.push(dept.name)
-          deptArray.id.push(dept.id) } )
-          
+          deptArray.id.push(dept.id) } )     
     })
     // question array for add role inquirer prompt
     const rolePrompt = [
@@ -129,21 +128,24 @@ const addRole = () => {
 }
 
 const addEmployee = () => {
-  let empRole = []
+  let empRole = {title:[], id:[]}
   let managers = [`none`]
+  let manID = []
+
   connection.query(`SELECT * FROM role`, (err, roleData) => {
     err?
     console.error(err) :
     roleData.forEach((role) => {
-      empRole.push(role.title)
+      empRole.title.push(role.title)
+      empRole.id.push(role.id)
     })
    })
-  connection.query(`SELECT first_name FROM employee WHERE manager_id is NULL`, (err, data) => {
+  connection.query(`SELECT first_name, id FROM employee WHERE manager_id is NULL`, (err, data) => {
     err?
     console.error(err) :
     data.forEach((element) => {
-      managers.push(element.first_name)
-      
+      managers.push(element.first_name)   
+      manID.push(element.id)  
     })
   })
   //question array for add employee inquirer prompt
@@ -161,7 +163,7 @@ const employeePrompt = [
   {
     message: "Enter role",
     type: "list",
-    choices: empRole,
+    choices: empRole.title,
     name: "employeeRole",
   },
   {
@@ -171,18 +173,22 @@ const employeePrompt = [
     name: "employeeManager",
   }
 ]
+
 inquirer.prompt(employeePrompt).then((data) => {
+  let manIndex = managers.indexOf(data.employeeManager)
+  let index = empRole.title.indexOf(data.employeeRole)
   if (data.employeeManager !== `none`) {
-    connection.query(y(`INSERT INTO employee (first_name, last_name, role_id, manager_id) VALUES (?, ?, ?, ?)`,
-     [data.firstName, data.lastName, data.employeeRole, data.employeeManager]))
+    connection.query(`INSERT INTO employee (first_name, last_name, role_id, manager_id) VALUES (?, ?, ?, ?)`,
+     [data.firstName, data.lastName, empRole.id[index], manID[manIndex-1]])
+    console.log(manID)
   } else {
-    connection.query(y(`INSERT INTO employee (first_name, last_name, role_id, manager_id) VALUES (?, ?, ?, ?)`,
-     [data.firstName, data.lastName, data.employeeRole, null]))
+    connection.query(`INSERT INTO employee (first_name, last_name, role_id, manager_id) VALUES (?, ?, ?, ?)`,
+     [data.firstName, data.lastName, empRole.id[index], null])
   }
   console.log(`${data.firstName} ${data.lastName} has been added as a new emplyee`)
-  mainMenu()
+  mainMenu()  
 
-})
+}).catch(err => console.error(err))
     
 }
 
