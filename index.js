@@ -10,24 +10,6 @@ const connection = mysql.createConnection({
   database: 'employee_db'
 },
 console.log(`Connection to employee_db was succesful`));
-//question array for main menu inquirer prompt
-const promptMenu = [
-    {
-      message: `What would you like to do?`,
-      type: `list`,
-      choices: [
-        `View All Departments`,
-        `View All Roles`,
-        `View All Employees`,
-        `Add Department`,
-        `Add Role`,
-        `Add Employee`,
-        `Update Employee Role`,
-        `Exit`,
-      ],
-      name: 'action'
-    },
-  ];
 
 const viewDept = () => {
     connection.query(`SELECT * FROM department`, (err, data) => {
@@ -243,6 +225,25 @@ const exit = () => {
 }
 
 const mainMenu = () => {
+  //question array for main menu inquirer prompt
+const promptMenu = [
+  {
+    message: `What would you like to do?`,
+    type: `list`,
+    choices: [
+      `View All Departments`,
+      `View All Roles`,
+      `View All Employees`,
+      `Add Department`,
+      `Add Role`,
+      `Add Employee`,
+      `Update Employee Role`,
+      `Exit`,
+    ],
+    name: 'action'
+  },
+];
+
     inquirer.prompt(promptMenu).then((data) => {
       const action = data.action;
       switch (action) {
