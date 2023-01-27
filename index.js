@@ -61,11 +61,11 @@ const viewEmployees = () => {
       ORDER BY employee.id;`,
       (err, data) => {
         err ? console.error(err) : console.table(data);
-        mainMenu();
+        mainMenu()
       }
     );
   }
-  
+  //ADD department function
 const addDept = () => {
   // question array for add department inquirer prompt
 const addDeptPrompt = [
@@ -84,14 +84,14 @@ const addDeptPrompt = [
     .catch(err => console.error(err));
     
 }
-
+// ADD role function
 const addRole = () => {
     console.log(`you selected add role`)
     let deptArray = {name:[], id:[]}
-    connection.query(`SELECT id, name FROM department`, (err, data) => {
+    connection.query(`SELECT id, name FROM department`, (err, dataRole) => {
       err ?
        console.error(err) :
-       data.forEach( (dept) => { //iterates through ever item in array reurned from mysql query and populates name and id arrays in deptarray object
+       dataRole.forEach( (dept) => { //iterates through ever item in array reurned from mysql query and populates name and id arrays in deptarray object
           deptArray.name.push(dept.name)
           deptArray.id.push(dept.id) } )     
     })
@@ -122,11 +122,9 @@ const addRole = () => {
         [data.roleName, data.roleSalary, deptName])
         console.log()
         mainMenu()
-      })
-      .catch(err => console.error(err))
-    
+      }).catch(err => console.error(err))   
 }
-
+//ADD employee function
 const addEmployee = () => {
   let empRole = {title:[], id:[]}
   let managers = [`none`]
@@ -191,46 +189,41 @@ inquirer.prompt(employeePrompt).then((data) => {
 }).catch(err => console.error(err))
     
 }
-
+//UPDATE role function
 const updateRole = () => {
-  let employeeList =  {name:[], id:[]}
-  
-
+ let employeeList = {name: [], id: []}
+ let roleList = {id:[], title: []}
   connection.query(`SELECT first_name, last_name, id FROM employee`, (err, nameData) => {
-    err?
-      console.error(err):
+    err ?
+      console.error(err) :
       nameData.forEach((obj) => {
         employeeList.name.push(`${obj.first_name} ${obj.last_name}`)
         employeeList.id.push(obj.id)
       })
-    })
-  let roleList = {id:[], title: []}
+   
   connection.query(`SELECT id, title FROM role`, (err, roleData) => {
     err?
-      console.error(err):
+      console.error(err) :
       roleData.forEach((obj)=>{
         roleList.id.push(obj.id)
         roleList.title.push(obj.title)
       })
     })
-
-
-  const updateRolePrompt = [
-    {
-      message: `Select employee you want to update`,
-      type: `list`,
-      choices: employeeList.name,
-      name: `updatedEmployee`,
-    },
-    {
-      message: `Select new role for slected employee`,
-      type: `list`,
-      choices: roleList.title,
-      name: `updatedRole`,
-    }
-  ]
-
-  inquirer.prompt(updateRolePrompt).then((data) => {
+const updatePrompt = [
+  {
+    message: `Select employee you want to update`,
+    type: `list`,
+    name: `updatedEmployee`,
+    choices: employeeList.name,
+  },
+  {
+    message: `Select new role for slected employee`,
+    type: `list`,
+    choices: roleList.title,
+    name: `updatedRole`,
+  }
+]
+inquirer.prompt(updatePrompt).then((data) => {
     let empIndex = employeeList.name.indexOf(data.updatedEmployee)
     let idIndex = roleList.title.indexOf(data.updatedRole)
     connection.query(`UPDATE employee SET ? WHERE ?`, [
@@ -241,7 +234,7 @@ const updateRole = () => {
     console.log(`the role of ${data.updatedEmployee} has been updated to ${data.updatedRole}`)
     mainMenu()
   }).catch(err => console.error(err))
-    
+})   
 }
 
 const exit = () => {
