@@ -1,4 +1,4 @@
-# Employee Tracker - CMS
+# Employee Tracker - CMS              [![MIT License](https://img.shields.io/static/v1?label=license&message=MIT&color=red)](https://choosealicense.com/licenses/mit/)
 
 ## Description
 
